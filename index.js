@@ -3,8 +3,25 @@
  let nameInp = document.querySelector("#name")
  let emailInp = document.querySelector("#email")
  let phoneInp = document.querySelector("#phone")
+ window.addEventListener("load" , docall)
+    
+    function docall()
+    {
+        axios.get("https://crudcrud.com/api/5e23e7d240c14587b1b0194169f1a010/users")
+        .then(res=>{
+            // console.log(res.data)
+            // showOutput(res.data)
+            res.data.forEach(user=>{
+                // console.log(user.name)
+                localStorage.setItem(user.name , JSON.stringify(user))
+            })
+        })
+        .catch(err=>console.log(err))
 
- 
+        showOutput();
+    }
+
+
     function dothis(e)
     {
         e.preventDefault();
@@ -13,17 +30,40 @@
         let userobj = {
             name:user.name.value,
             email:user.email.value,
-            number:user.phone.value,
+            phone:user.phone.value,
         }
-       
-       
         localStorage.setItem(userobj.name,JSON.stringify(userobj));
+        axios
+        .post(
+          "https://crudcrud.com/api/5e23e7d240c14587b1b0194169f1a010/users",
+          userobj
+        )
+        .then((res) => {
+          console.log(res);
+          addtoDom(JSON.parse(localStorage.getItem(userobj.name)))
+        })
+        .catch(err=>{
+            console.log(err);
+        });
+        
+    }
+     
+    function showOutput()
+    {     
+        let users = Object.keys(localStorage)
+         users.forEach(user => {
+            let a = JSON.parse( localStorage.getItem( user))
+            addtoDom(a);
+        });
+    }
 
-
+      function addtoDom(a)
+      {
+        // console.log(a)
         let liEle = document.createElement("li");
         let btn = document.createElement("button");
         let editbtn = document.createElement("button")
-        liEle.textContent = userobj.name+"   " + userobj.email+"   "+userobj.number;
+        liEle.textContent =  a.name+"   " + a.email+"   "+a.phone;
         btn.innerText = "delete"
         btn.className = "delete btn btn-danger btn-sm ";
         btn.addEventListener("click",deleteuser)
@@ -34,14 +74,11 @@
         liEle.appendChild(btn)
         liEle.appendChild(editbtn)
         ulItems.appendChild(liEle);
-       
-    }
-     
+      }
 
     
     function deleteuser(e)
     {   
-        console.log("esl")
         let li = e.target.parentElement;
         let ul = li.parentElement;
         let key = li.textContent.split(" ")[0];
@@ -51,6 +88,9 @@
         ulItems.removeChild(li);
 
     }
+
+    let a = new Set();
+
 
     function edituser(e)
     {
