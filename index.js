@@ -4,12 +4,12 @@ let ulItems = document.querySelector("#items");
 let nameInp = document.querySelector("#name");
 let emailInp = document.querySelector("#email");
 let phoneInp = document.querySelector("#phone");
-window.addEventListener("load", OnLoad);
+window.addEventListener( "load" , OnLoad);
 
 // function that gets called for the first time window loads
 function OnLoad() {
   axios
-    .get("https://crudcrud.com/api/eb7de077b62e4abab2890bff988fc248/users")
+    .get("http://localhost:5000")
     .then((res) => {
       LoadListItems(res.data);
     })
@@ -25,17 +25,17 @@ function dothis(e) {
 
   let userobj = {
     name: user.name.value,
-    email: user.email.value,
     phone: user.phone.value,
+    Email: user.email.value,
   };
-  axios
+  axios 
   .post(
-    "https://crudcrud.com/api/eb7de077b62e4abab2890bff988fc248/users",
+    "http://localhost:5000",
     userobj
     )
     .then((res) => {
-      localStorage.setItem(res.data._id,JSON.stringify(res.data));
-      addtoDom(res.data._id);
+      addtoDom(res.data);
+      console.log(res.data)
     })
     .catch((err) => {
       console.log(err);
@@ -47,8 +47,7 @@ function dothis(e) {
 // function that first called to get the user on the screeen for the first time
 function LoadListItems(users) {
   users.forEach((user) => {
-    localStorage.setItem(user._id , JSON.stringify(user))
-    addtoDom(user._id);
+    addtoDom(user) ;
   });
 }
 
@@ -60,10 +59,10 @@ function addtoDom(a) {
   let btn = document.createElement("button");
   let editbtn = document.createElement("button");
 
-  let userDetails = JSON.parse( localStorage.getItem(a));
-  liEle.textContent =  userDetails.name 
-  + "   " +  userDetails.phone + "   " +
-  userDetails.email;
+ console.log(a.id);
+  liEle.textContent =  a.name 
+  + "   " +  a.phone + "   " +
+  a.Email;
 
   btn.innerText = "delete";
   btn.className = "delete btn btn-danger btn-sm ";
@@ -72,7 +71,7 @@ function addtoDom(a) {
   editbtn.className = "edit btn btn-success btn-sm";
   editbtn.addEventListener("click", edituser);
 
-  liEle.id = a;
+  liEle.id = a.id;
   liEle.appendChild(btn);
   liEle.appendChild(editbtn);
   ulItems.appendChild(liEle);
@@ -94,8 +93,8 @@ function deleteuser(e) {
 //function that actually deletes an item from the userdaa array
 function deleteFromStorage(userId) {
   
-  localStorage.removeItem(userId);
-  axios.delete(`https://crudcrud.com/api/eb7de077b62e4abab2890bff988fc248/users/${userId}`)
+  // localStorage.removeItem(userId);
+  axios.delete(`http://localhost:5000/${userId}`)
   .then(res => {
     console.log(res)
   })
@@ -117,3 +116,5 @@ function edituser(e) {
 
   ulItems.removeChild(liele);
 }
+
+ 
